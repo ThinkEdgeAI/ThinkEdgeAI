@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ThinkEdge AI Chatbot</title>
+  <title>ThinkEdge AI Chat Widget</title>
   <style>
     :root {
       --bg: #101218;
@@ -17,54 +17,80 @@
     body {
       margin: 0;
       padding: 0;
-      background: var(--bg);
-      color: var(--text);
       font-family: var(--font);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    }
+
+    #chat-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--user);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 28px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      z-index: 1000;
     }
 
     #chat-container {
-      width: 380px;
-      height: 600px;
+      display: none;
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 360px;
+      height: 500px;
       background: var(--bg);
       border: 1px solid #2b2f3c;
       border-radius: 16px;
-      display: flex;
-      flex-direction: column;
       box-shadow: 0 0 12px rgba(0,0,0,0.5);
       overflow: hidden;
+      flex-direction: column;
+      animation: fadeInUp 0.3s ease-out;
+      z-index: 999;
+    }
+
+    @keyframes fadeInUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
     #messages {
       flex: 1;
       padding: 20px;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
     .message {
       max-width: 80%;
-      margin: 10px 0;
       padding: 12px 16px;
       border-radius: 14px;
       font-size: 15px;
       line-height: 1.4;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .bot {
       align-self: flex-start;
       background: var(--bot);
       color: #e0e0e0;
-      box-shadow: 0 0 6px rgba(108,99,255,0.2);
     }
 
     .user {
       align-self: flex-end;
       background: var(--user);
       color: white;
-      box-shadow: 0 0 6px rgba(108,99,255,0.2);
     }
 
     #input-area {
@@ -97,6 +123,7 @@
   </style>
 </head>
 <body>
+  <button id="chat-button">💬</button>
   <div id="chat-container">
     <div id="messages">
       <div class="message bot">👋 Hi! I'm your ThinkEdge AI assistant. How can I help you today?</div>
@@ -111,8 +138,14 @@
     const input = document.getElementById("input");
     const send = document.getElementById("send");
     const messages = document.getElementById("messages");
+    const chatContainer = document.getElementById("chat-container");
+    const chatButton = document.getElementById("chat-button");
 
-    const webhookURL = "https://aldooo.app.n8n.cloud/webhook/chatbot"; // 🔁 Replace with your real webhook
+    const webhookURL = "https://aldooo.app.n8n.cloud/webhook/chatbot";
+
+    chatButton.onclick = () => {
+      chatContainer.style.display = chatContainer.style.display === "flex" ? "none" : "flex";
+    };
 
     function addMessage(text, sender = "user") {
       const div = document.createElement("div");
