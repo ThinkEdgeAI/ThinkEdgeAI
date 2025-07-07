@@ -143,6 +143,13 @@
 
     const webhookURL = "https://aldooo.app.n8n.cloud/webhook/chatbot";
 
+    // ✅ Session ID logic
+    let sessionId = localStorage.getItem("sessionId");
+    if (!sessionId) {
+      sessionId = Date.now() + "-" + Math.floor(Math.random() * 10000);
+      localStorage.setItem("sessionId", sessionId);
+    }
+
     chatButton.onclick = () => {
       chatContainer.style.display = chatContainer.style.display === "flex" ? "none" : "flex";
     };
@@ -166,11 +173,11 @@
         const res = await fetch(webhookURL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text })
+          body: JSON.stringify({ message: text, sessionId: sessionId })  // 👈 include sessionId
         });
 
         const data = await res.json();
-        reply = data.reply;
+        const reply = data.reply;
         addMessage(reply, "bot");
       } catch (err) {
         addMessage("⚠️ Error connecting to server.", "bot");
