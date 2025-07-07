@@ -138,10 +138,33 @@
     }
 
     .typing-indicator {
-      font-style: italic;
-      font-size: 14px;
-      color: #aaa;
-      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: 8px;
+      padding: 10px;
+    }
+
+    .typing-indicator span {
+      display: block;
+      width: 8px;
+      height: 8px;
+      background-color: #aaa;
+      border-radius: 50%;
+      animation: typing-bounce 1.2s infinite ease-in-out;
+    }
+
+    .typing-indicator span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-indicator span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typing-bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-8px); }
     }
   </style>
 </head>
@@ -149,7 +172,7 @@
   <button id="chat-button">💬</button>
   <div id="chat-container">
     <div id="chat-header">
-      <img src="https://drive.google.com/uc?export=view&id=1iD8fFQw2QuIbBJ_Vpc5rEGrolgNM6TFE" alt="Logo" />
+      <img src="https://i.imgur.com/Yv6cujd.png" alt="Logo" />
       <span>ThinkEdge AI</span>
     </div>
     <div id="messages">
@@ -183,11 +206,16 @@
     }
 
     function showTypingIndicator() {
-      const typing = document.createElement("div");
-      typing.className = "message bot typing-indicator";
-      typing.id = "typing";
-      typing.textContent = "🤖 Bot is typing...";
-      messages.appendChild(typing);
+      const wrapper = document.createElement("div");
+      wrapper.className = "message bot typing-indicator";
+      wrapper.id = "typing";
+
+      for (let i = 0; i < 3; i++) {
+        const dot = document.createElement("span");
+        wrapper.appendChild(dot);
+      }
+
+      messages.appendChild(wrapper);
       messages.scrollTop = messages.scrollHeight;
     }
 
