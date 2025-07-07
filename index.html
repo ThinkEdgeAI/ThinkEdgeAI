@@ -38,6 +38,7 @@
 
     #chat-container {
       display: none;
+      flex-direction: column;
       position: fixed;
       bottom: 90px;
       right: 20px;
@@ -48,7 +49,6 @@
       border-radius: 16px;
       box-shadow: 0 0 12px rgba(0,0,0,0.5);
       overflow: hidden;
-      flex-direction: column;
       animation: fadeInUp 0.3s ease-out;
       z-index: 999;
     }
@@ -56,6 +56,22 @@
     @keyframes fadeInUp {
       from { transform: translateY(50px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
+    }
+
+    #chat-header {
+      background: #15171f;
+      padding: 12px 16px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #2b2f3c;
+    }
+
+    #chat-header img {
+      height: 28px;
+      width: 28px;
+      object-fit: contain;
     }
 
     #messages {
@@ -120,11 +136,22 @@
       font-weight: bold;
       cursor: pointer;
     }
+
+    .typing-indicator {
+      font-style: italic;
+      font-size: 14px;
+      color: #aaa;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
   <button id="chat-button">💬</button>
   <div id="chat-container">
+    <div id="chat-header">
+      <img src="https://your-logo-url.com/logo.png" alt="Logo" />
+      <span>ThinkEdge AI</span>
+    </div>
     <div id="messages">
       <div class="message bot">👋 Hi! I'm your ThinkEdge AI assistant. How can I help you today?</div>
     </div>
@@ -135,62 +162,69 @@
   </div>
 
   <script>
-  const input = document.getElementById("input");
-  const send = document.getElementById("send");
-  const messages = document.getElementById("messages");
-  const chatContainer = document.getElementById("chat-container");
-  const chatButton = document.getElementById("chat-button");
+    const input = document.getElementById("input");
+    const send = document.getElementById("send");
+    const messages = document.getElementById("messages");
+    const chatContainer = document.getElementById("chat-container");
+    const chatButton = document.getElementById("chat-button");
 
-  const webhookURL = "https://aldooo.app.n8n.cloud/webhook/chatbot";
+    const webhookURL = "https://aldooo.app.n8n.cloud/webhook/chatbot";
 
-  // ⬇️ Persistent sessionId across messages
-  let sessionId = localStorage.getItem("sessionId");
-  if (!sessionId) {
-    sessionId = Date.now() + "-" + Math.floor(Math.random() * 10000);
-    localStorage.setItem("sessionId", sessionId);
-  }
+    chatButton.onclick = () => {
+      chatContainer.style.display = chatContainer.style.display === "flex" ? "none" : "flex";
+    };
 
-  chatButton.onclick = () => {
-    chatContainer.style.display = chatContainer.style.display === "flex" ? "none" : "flex";
-  };
-
-  function addMessage(text, sender = "user") {
-    const div = document.createElement("div");
-    div.className = `message ${sender}`;
-    div.textContent = text;
-    messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
-  }
-
-  async function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
-
-    addMessage(text, "user");
-    input.value = "";
-
-    try {
-      const res = await fetch(webhookURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: text,
-          sessionId: sessionId // 🔥 Make sure this is sent!
-        })
-      });
-
-      const data = await res.json();
-      const reply = data.reply;
-      addMessage(reply, "bot");
-    } catch (err) {
-      addMessage("⚠️ Error connecting to server.", "bot");
+    function addMessage(text, sender = "user") {
+      const div = document.createElement("div");
+      div.className = `message ${sender}`;
+      div.textContent = text;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
     }
-  }
 
-  send.onclick = sendMessage;
-  input.addEventListener("keydown", e => {
-    if (e.key === "Enter") sendMessage();
-  });
-</script>
+    function showTypingIndicator() {
+      const typing = document.createElement("div");
+      typing.className = "message bot typing-indicator";
+      typing.id = "typing";
+      typing.textContent = "🤖 Bot is typing...";
+      messages.appendChild(typing);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+      const typing = document.getElementById("typing");
+      if (typing) typing.remove();
+    }
+
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      addMessage(text, "user");
+      input.value = "";
+
+      showTypingIndicator();
+
+      try {
+        const res = await fetch(webhookURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text })
+        });
+
+        const data = await res.json();
+        removeTypingIndicator();
+        addMessage(data.reply || "⚠️ No response from bot", "bot");
+      } catch (err) {
+        removeTypingIndicator();
+        addMessage("⚠️ Error connecting to server.", "bot");
+      }
+    }
+
+    send.onclick = sendMessage;
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
 </body>
 </html>
