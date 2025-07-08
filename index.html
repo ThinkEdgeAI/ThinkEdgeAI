@@ -20,47 +20,15 @@
       font-family: var(--font);
     }
 
-    #chat-button {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: var(--user);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 28px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-      z-index: 1000;
-      transition: transform 0.3s ease;
-    }
-
-    #chat-button:hover {
-      transform: scale(1.1) rotate(5deg);
-    }
-
     #chat-container {
-      display: none;
+      display: flex;
       flex-direction: column;
-      position: fixed;
-      bottom: 90px;
-      right: 20px;
-      width: 360px;
-      height: 500px;
+      width: 100%;
+      height: 100vh;
       background: var(--bg);
-      border: 1px solid #2b2f3c;
       border-radius: 16px;
       box-shadow: 0 0 12px rgba(0,0,0,0.5);
       overflow: hidden;
-      animation: fadeInUp 0.3s ease-out;
-      z-index: 999;
-    }
-
-    @keyframes fadeInUp {
-      from { transform: translateY(50px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
     }
 
     #chat-header {
@@ -182,7 +150,6 @@
   </style>
 </head>
 <body>
-  <button id="chat-button">💬</button>
   <div id="chat-container">
     <div id="chat-header">
       <img src="https://i.imgur.com/VPWzyBV.png" alt="Logo" />
@@ -201,8 +168,6 @@
     const input = document.getElementById("input");
     const send = document.getElementById("send");
     const messages = document.getElementById("messages");
-    const chatContainer = document.getElementById("chat-container");
-    const chatButton = document.getElementById("chat-button");
 
     const webhookURL = "https://aldooo.app.n8n.cloud/webhook/chatbot";
 
@@ -223,17 +188,13 @@
       setCookie("sessionId", sessionId, 1);
     }
 
-    chatButton.onclick = () => {
-      chatContainer.style.display = chatContainer.style.display === "flex" ? "none" : "flex";
-    };
-
     function addMessage(text, sender = "user") {
       const div = document.createElement("div");
       div.className = `message ${sender}`;
       text = text
-  .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // convert **bold**
-  .replace(/\n/g, '<br>'); // line breaks
-div.innerHTML = text;
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // convert **bold**
+        .replace(/\n/g, '<br>'); // line breaks
+      div.innerHTML = text;
       messages.appendChild(div);
       messages.scrollTop = messages.scrollHeight;
     }
@@ -266,7 +227,7 @@ div.innerHTML = text;
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             message: text,
-            sessionId: sessionId // 👈 Now included with every message
+            sessionId: sessionId
           })
         });
 
