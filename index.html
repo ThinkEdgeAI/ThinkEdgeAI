@@ -14,32 +14,25 @@
       --font: 'Segoe UI', 'Inter', sans-serif;
     }
 
-    body {
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
       margin: 0;
       padding: 0;
+      height: 100%;
       font-family: var(--font);
+      background: var(--bg);
+      overflow: hidden;
     }
 
     #chat-container {
       display: flex;
       flex-direction: column;
-      position: fixed;
-      bottom: 90px;
-      right: 20px;
-      width: 360px;
-      height: 500px;
+      width: 100%;
+      height: 100%;
       background: var(--bg);
-      border: 1px solid #2b2f3c;
-      border-radius: 16px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.5);
-      overflow: hidden;
-      animation: fadeInUp 0.3s ease-out;
-      z-index: 999;
-    }
-
-    @keyframes fadeInUp {
-      from { transform: translateY(50px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
     }
 
     #chat-header {
@@ -175,12 +168,9 @@
     const input = document.getElementById("input");
     const send = document.getElementById("send");
     const messages = document.getElementById("messages");
-    const chatContainer = document.getElementById("chat-container");
-    const chatButton = document.getElementById("chat-button");
 
     const webhookURL = "https://aldooo.app.n8n.cloud/webhook/chatbot";
 
-    // COOKIE SESSION ID HANDLING
     function getCookie(name) {
       const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
       return match ? match[2] : null;
@@ -196,7 +186,6 @@
       sessionId = `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
       setCookie("sessionId", sessionId, 1);
     }
-
 
     function addMessage(text, sender = "user") {
       const div = document.createElement("div");
